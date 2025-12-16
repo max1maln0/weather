@@ -1,4 +1,4 @@
-
+import Weather from './pages/Weather/Weather.jsx';
 
 
 function App() {
@@ -6,7 +6,7 @@ function App() {
 
   return (
     <>
-      
+      <Weather />
     </>
   )
 }
