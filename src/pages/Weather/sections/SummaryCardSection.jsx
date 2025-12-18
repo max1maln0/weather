@@ -1,4 +1,4 @@
-import cloude from '../../../assets/icons/Cloude.png';
+
 
 export default function SummaryCardSection({ hourly }) {
     if (!hourly) return null;
@@ -15,7 +15,7 @@ export default function SummaryCardSection({ hourly }) {
                 <div key={item.time} className="flex flex-col items-center gap-2">
                     <div className="text-xs text-white/80">{item.time}</div>
                 <div>
-                    <img src={cloude} alt="cloude" className='w-8 h-8'/>
+                    <img src={`https://openweathermap.org/img/wn/${item.icon}@2x.png`} alt="" className='w-8 h-8'/>
                 </div>
                 <div className="text-lg font-medium">{item.temp}°</div>
             </div>

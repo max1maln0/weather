@@ -4,6 +4,7 @@ export default function HeroSection({ weather }) {
     if (!weather) return null;
 
     const { city, temperature} = weather;
+    
     return(
         <section className="text-center lg:text-left py-10 px-10 ">
             <div className="inline-block text-center">
