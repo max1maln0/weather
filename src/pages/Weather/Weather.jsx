@@ -155,7 +155,7 @@ const displayWeather = apiWeather ?? mockWeather;
           </div>
         </div>
 
-        <div className="mt-6 w-full max-w-3xl mx-auto px-1">
+        <div className="mt-6 w-full max-w-3xl mx-auto px-0">
           <DailyForecastSection daily={displayWeather.daily} />
         </div>
       </div>
