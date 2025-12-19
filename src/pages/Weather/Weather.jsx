@@ -133,8 +133,6 @@ const displayWeather = apiWeather ?? mockWeather;
 
   return (
     <>
-      <Header />
-
       <div className="px-6 mt-6">
         {error && (
           <p className="mb-4 text-sm text-red-300">
@@ -157,7 +155,7 @@ const displayWeather = apiWeather ?? mockWeather;
           </div>
         </div>
 
-        <div className="mt-6 w-full max-w-3xl mx-auto px-6">
+        <div className="mt-6 w-full max-w-3xl mx-auto px-1">
           <DailyForecastSection daily={displayWeather.daily} />
         </div>
       </div>

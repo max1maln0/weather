@@ -1,13 +1,11 @@
-import Weather from './pages/Weather/Weather.jsx';
+import Router from "./router/Router.jsx";
 
 
 function App() {
 
 
   return (
-    <>
-      <Weather />
-    </>
+    <Router />
   )
 }
 
