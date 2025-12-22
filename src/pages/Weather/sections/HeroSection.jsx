@@ -1,6 +1,4 @@
-
-
-export default function HeroSection({ weather }) {
+ export default function HeroSection({ weather }) {
     if (!weather) return null;
 
     const { city, temperature} = weather;
