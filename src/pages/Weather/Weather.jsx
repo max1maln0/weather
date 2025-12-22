@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 import Header from "../../components/Header.jsx";
 
 import DailyForecastSection from "./sections/DailyForecastSection.jsx";
@@ -10,6 +11,10 @@ export default function Weather() {
   const [apiWeather, setApiWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [searchParams] = useSearchParams();
+  const cityFromUrl = searchParams.get("city");
+  const CITY = (cityFromUrl || import.meta.env.VITE_OWM_CITY || "New York").trim();
 
   const mockWeather = {
     city: "New York",
@@ -57,21 +62,22 @@ export default function Weather() {
 
   useEffect(() => {
     const fetchWeather = async () => {
-    const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+      const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
-    if (USE_MOCK) {
-      setApiWeather({
-        ...mockWeather,
-        hourly: { summary: "Hourly forecast", items: mockWeather.hourly.items },
-        daily: { items: mockWeather.daily.items },
-      });
-      return;
-    }
+      if (USE_MOCK) {
+        setError(null);
+        setLoading(false);
+        setApiWeather({
+          ...mockWeather,
+          city: CITY,
+          hourly: { summary: "Hourly forecast", items: mockWeather.hourly.items },
+          daily: { items: mockWeather.daily.items },
+        });
+        return;
+      }
 
       const API_KEY = import.meta.env.VITE_API_KEY;
       const BASE_URL = import.meta.env.VITE_BASE_URL;
-      const CITY = import.meta.env.VITE_OWM_CITY || "New York";
-
 
       if (!API_KEY || !BASE_URL) {
         setError(new Error("Missing env vars. Need VITE_API_KEY, VITE_BASE_URL"));
@@ -99,16 +105,16 @@ export default function Weather() {
           },
         });
 
-        const hourlyItems = forecast.data.list.slice(0, 5).map((item, index) => {
-          const date = new Date(item.dt * 1000);
+        const hourlyItems = (forecast.data?.list || []).slice(0, 5).map((item, index) => {
+          const date = new Date((item?.dt ?? 0) * 1000);
 
           return {
             time:
               index === 0
                 ? "Now"
                 : date.toLocaleTimeString([], { hour: "numeric", hour12: true }),
-            temp: Math.round(item.main.temp),
-            icon: item.weather?.[0]?.icon ?? "01d",
+            temp: Math.round(item?.main?.temp ?? 0),
+            icon: item?.weather?.[0]?.icon ?? "01d",
           };
         });
 
@@ -116,7 +122,7 @@ export default function Weather() {
 
         const formattedCurrent = mapCurrentWeather(res.data);
 
-        const formatted = {
+        setApiWeather({
           ...formattedCurrent,
           hourly: {
             summary: "Hourly forecast",
@@ -125,9 +131,7 @@ export default function Weather() {
           daily: {
             items: dailyItems,
           },
-        };
-
-        setApiWeather(formatted);
+        });
       } catch (err) {
         setError(err);
         console.error("OpenWeather error:", err);
@@ -137,9 +141,12 @@ export default function Weather() {
     };
 
     fetchWeather();
-  }, []);
+  }, [CITY]);
 
-  const displayWeather = apiWeather ?? mockWeather;
+  const displayWeather = apiWeather ?? {
+    ...mockWeather,
+    city: CITY || mockWeather.city,
+  };
 
   return (
     <>
@@ -150,7 +157,9 @@ export default function Weather() {
           </p>
         )}
         {loading && <p className="mb-4 text-sm text-white/70">Loading weather...</p>}
+
         <Header />
+
         <div className="flex flex-col lg:flex-row items-start gap-10">
           <div className="w-[320px] shrink-0">
             <HeroSection weather={displayWeather} />
