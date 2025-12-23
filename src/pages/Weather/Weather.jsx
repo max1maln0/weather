@@ -88,7 +88,9 @@ export default function Weather() {
         setLoading(true);
         setError(null);
 
-        const res = await axios.get(`${BASE_URL}/weather`, {
+        const base = BASE_URL.replace(/\/+$/, "");
+
+        const res = await axios.get(`${base}/weather`, {
           params: {
             q: CITY,
             appid: API_KEY,
@@ -96,7 +98,7 @@ export default function Weather() {
           },
         });
 
-        const forecast = await axios.get(`${BASE_URL}/forecast`, {
+        const forecast = await axios.get(`${base}/forecast`, {
           params: {
             q: CITY,
             appid: API_KEY,
@@ -118,19 +120,14 @@ export default function Weather() {
           };
         });
 
-        const dailyItems = mockWeather.daily.items;
+        const dailyItems = mockWeather.daily.items; // пока мок
 
         const formattedCurrent = mapCurrentWeather(res.data);
 
         setApiWeather({
           ...formattedCurrent,
-          hourly: {
-            summary: "Hourly forecast",
-            items: hourlyItems,
-          },
-          daily: {
-            items: dailyItems,
-          },
+          hourly: { summary: "Hourly forecast", items: hourlyItems },
+          daily: { items: dailyItems },
         });
       } catch (err) {
         setError(err);
@@ -143,39 +140,34 @@ export default function Weather() {
     fetchWeather();
   }, [CITY]);
 
-  const displayWeather = apiWeather ?? {
-    ...mockWeather,
-    city: CITY || mockWeather.city,
-  };
+  const displayWeather = apiWeather ?? { ...mockWeather, city: CITY || mockWeather.city };
 
   return (
-    <>
-      <div className="px-6 mt-6">
-        {error && (
-          <p className="mb-4 text-sm text-red-300">
-            API error: {String(error.message || error)}
-          </p>
-        )}
-        {loading && <p className="mb-4 text-sm text-white/70">Loading weather...</p>}
+    <div className="px-6 mt-6">
+      {error && (
+        <p className="mb-4 text-sm text-red-300">
+          API error: {String(error.message || error)}
+        </p>
+      )}
+      {loading && <p className="mb-4 text-sm text-white/70">Loading weather...</p>}
 
-        <Header />
+      <Header />
 
-        <div className="flex flex-col lg:flex-row items-start gap-10">
-          <div className="w-[320px] shrink-0">
-            <HeroSection weather={displayWeather} />
-          </div>
-
-          <div className="flex-1 lg:mt-10 w-full">
-            <div className="w-full max-w-3xl mx-auto">
-              <SummaryCardSection hourly={displayWeather.hourly} />
-            </div>
-          </div>
+      <div className="flex flex-col lg:flex-row items-start gap-10">
+        <div className="w-[320px] shrink-0">
+          <HeroSection weather={displayWeather} />
         </div>
 
-        <div className="mt-6 w-full max-w-3xl mx-auto px-0">
-          <DailyForecastSection daily={displayWeather.daily} />
+        <div className="flex-1 lg:mt-10 w-full">
+          <div className="w-full max-w-3xl mx-auto">
+            <SummaryCardSection hourly={displayWeather.hourly} />
+          </div>
         </div>
       </div>
-    </>
+
+      <div className="mt-6 w-full max-w-3xl mx-auto px-0">
+        <DailyForecastSection daily={displayWeather.daily} />
+      </div>
+    </div>
   );
 }

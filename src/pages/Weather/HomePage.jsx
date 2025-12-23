@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
-import Input from "../../components/Input";
+import CityAutocomplete from "../../components/CityAutocomplete.jsx";
 
 export default function HomePage() {
-  const [city, setCity] = useState(import.meta.env.VITE_OWM_CITY || "");
-
-  const cityTrimmed = city.trim();
-  const toWeather = cityTrimmed
-    ? `/weather?city=${encodeURIComponent(cityTrimmed)}`
+  const defaultCity = useMemo(() => import.meta.env.VITE_OWM_CITY || "", []);
+  const [selectedLoc, setSelectedLoc] = useState(null);
+  const toWeather = selectedLoc
+    ? `/weather?city=${encodeURIComponent(selectedLoc.name)}`
     : "/weather";
+
+  const canGo = Boolean(selectedLoc);
 
   return (
     <>
@@ -24,16 +25,20 @@ export default function HomePage() {
       </div>
 
       <div className="flex flex-col items-center gap-5">
-        <Input
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="Введите город..."
+        <CityAutocomplete
+          initialValue={defaultCity}
+          onPick={(loc) => {
+            setSelectedLoc(loc);
+          }}
         />
 
         <Link
           to={toWeather}
           className="rounded-xl bg-white/5 border border-white/10 px-4 py-2 text-sm"
-          style={{ pointerEvents: cityTrimmed ? "auto" : "none", opacity: cityTrimmed ? 1 : 0.5 }}
+          style={{
+            pointerEvents: canGo ? "auto" : "none",
+            opacity: canGo ? 1 : 0.5,
+          }}
         >
           Перейти к погоде →
         </Link>
